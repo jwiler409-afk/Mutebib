@@ -1,0 +1,70 @@
+{
+  "name": "MUTAB - Mutuelle des Élèves de Béraca",
+  "short_name": "MUTAB",
+  "description": "Application de gestion de mutuelle scolaire",
+  "scope": "/",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#4A90E2",
+  "categories": ["finance", "productivity"],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'%3E%3Crect fill='%234A90E2' width='540' height='720'/%3E%3Ctext x='270' y='360' font-size='80' fill='white' text-anchor='middle' dominant-baseline='middle' font-family='Arial'%3EMUTAB%3C/text%3E%3C/svg%3E",
+      "sizes": "540x720",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    }
+  ],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%234A90E2' width='192' height='192' rx='45'/%3E%3Ctext x='96' y='96' font-size='100' fill='white' text-anchor='middle' dominant-baseline='middle' font-family='Arial'%3E💰%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Cmask id='m'%3E%3Crect fill='white' width='192' height='192'/%3E%3Ccircle cx='96' cy='96' r='75' fill='black'/%3E%3C/mask%3E%3Crect fill='%234A90E2' width='192' height='192' mask='url(%23m)'/%3E%3Ctext x='96' y='96' font-size='100' fill='white' text-anchor='middle' dominant-baseline='middle' font-family='Arial'%3E💰%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%234A90E2' width='512' height='512' rx='120'/%3E%3Ctext x='256' y='256' font-size='280' fill='white' text-anchor='middle' dominant-baseline='middle' font-family='Arial'%3E💰%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nouveau Carnet",
+      "short_name": "Nouveau Carnet",
+      "description": "Créer un nouveau carnet de mutuelle",
+      "url": "/?action=new",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%2387CEEB' width='192' height='192' rx='45'/%3E%3Ctext x='96' y='96' font-size='100' fill='white' text-anchor='middle' dominant-baseline='middle' font-family='Arial'%3E➕%3C/text%3E%3C/svg%3E",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Rechercher Carnet",
+      "short_name": "Rechercher",
+      "description": "Rechercher un carnet existant",
+      "url": "/?action=search",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%2387CEEB' width='192' height='192' rx='45'/%3E%3Ctext x='96' y='96' font-size='100' fill='white' text-anchor='middle' dominant-baseline='middle' font-family='Arial'%3E🔍%3C/text%3E%3C/svg%3E",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": []
+}
