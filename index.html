@@ -781,7 +781,7 @@
                 <button class="btn-menu" onclick="openModal('listCarnetModal')">📱 Liste Carnets</button>
                 <button class="btn-menu" onclick="openModal('historyModal')">📋 Historique</button>
                 <button class="btn-menu" onclick="openModal('reportsModal')">📊 Rapports</button>
-                <button class="btn-menu" id="settingsBtnMenu" onclick="openModal('settingsModal')">⚙️ Paramètres</button>
+                <button class="btn-menu" id="settingsBtnMenu" onclick="openSettingsModal()">⚙️ Paramètres</button>
             </div>
         </div>
     </div>
@@ -1156,6 +1156,50 @@
                 </div>
 
                 <button class="btn btn-primary" onclick="changeAgentCode()" style="margin-bottom: 15px;">🔄 Modifier Code Agent</button>
+            </div>
+
+            <!-- ✅ NOUVEAU: Section Backup & Téléchargement Données -->
+            <h3 style="color: #27ae60; margin-bottom: 15px; margin-top: 25px; font-size: 14px;">💾 Sauvegarde Données</h3>
+
+            <div style="background: #f0f8f0; border: 1px solid #27ae60; border-radius: 8px; padding: 12px; margin-bottom: 15px;">
+                <p style="margin: 0 0 12px 0; color: #333; font-size: 12px;">
+                    <strong>📥 Télécharger toutes les données locales:</strong> Carnets, transactions, et queue de synchronisation.
+                </p>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                    <button class="btn btn-success" onclick="downloadAllLocalData()" style="background: #27ae60;">
+                        📥 Tout Télécharger
+                    </button>
+                    <button class="btn btn-success" onclick="downloadOnlyBackup()" style="background: #1e8449;">
+                        💾 Données Brutes
+                    </button>
+                </div>
+
+                <div style="font-size: 11px; color: #666; padding: 8px; background: white; border-radius: 4px; border-left: 3px solid #27ae60;">
+                    <strong>Fichiers créés:</strong>
+                    <br>• <code>MUTEB_backup_complete_DATE.json</code> - Tous les données + stats
+                    <br>• <code>MUTEB_data_DATE.json</code> - Données brutes uniquement
+                </div>
+            </div>
+
+            <!-- Stats des données -->
+            <div style="background: #e8f5e9; border-radius: 8px; padding: 12px; margin-bottom: 15px; border-left: 4px solid #27ae60;">
+                <h4 style="margin-top: 0; color: #1b5e20; font-size: 12px;">📊 Résumé Données Locales</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; font-size: 12px;">
+                    <div style="text-align: center; padding: 8px; background: white; border-radius: 4px;">
+                        <div id="statsCarnetCount" style="font-size: 18px; font-weight: bold; color: #27ae60;">0</div>
+                        <div style="color: #666;">Carnets</div>
+                    </div>
+                    <div style="text-align: center; padding: 8px; background: white; border-radius: 4px;">
+                        <div id="statsTransactionCount" style="font-size: 18px; font-weight: bold; color: #27ae60;">0</div>
+                        <div style="color: #666;">Transactions</div>
+                    </div>
+                    <div style="text-align: center; padding: 8px; background: white; border-radius: 4px;">
+                        <div id="statsPendingCount" style="font-size: 18px; font-weight: bold; color: #e74c3c;">0</div>
+                        <div style="color: #666;">Pending Sync</div>
+                    </div>
+                </div>
+                <button class="btn" onclick="updateDataStats()" style="width: 100%; margin-top: 10px; font-size: 11px;">🔄 Actualiser Stats</button>
             </div>
 
             <h3 style="color: #4A90E2; margin: 20px 0 15px 0; font-size: 14px;">🗑️ Gestion des Carnets</h3>
@@ -2095,6 +2139,116 @@
             showStatus('Code Agent modifié', 'success');
             document.getElementById('newAgentCode').value = '';
             document.getElementById('currentAgentCodeDisplay').textContent = AGENT_CODE;
+        }
+
+        // ============================================
+        // FONCTIONS TÉLÉCHARGEMENT DONNÉES LOCALES
+        // ============================================
+
+        function updateDataStats() {
+            try {
+                const carnets = JSON.parse(localStorage.getItem('muteb_carnets') || '{}');
+                const transactions = JSON.parse(localStorage.getItem('muteb_transactions') || '[]');
+                const pending = JSON.parse(localStorage.getItem('muteb_pending_sync') || '[]');
+
+                document.getElementById('statsCarnetCount').textContent = Object.keys(carnets).length;
+                document.getElementById('statsTransactionCount').textContent = transactions.length;
+                document.getElementById('statsPendingCount').textContent = pending.filter(t => !t.synced).length;
+
+                showStatus('✅ Stats actualisées', 'success');
+            } catch (err) {
+                showStatus('❌ Erreur: ' + err.message, 'error');
+            }
+        }
+
+        function downloadAllLocalData() {
+            try {
+                const carnets = JSON.parse(localStorage.getItem('muteb_carnets') || '{}');
+                const transactions = JSON.parse(localStorage.getItem('muteb_transactions') || '[]');
+                const pending = JSON.parse(localStorage.getItem('muteb_pending_sync') || '[]');
+
+                // Calculer stats
+                const totalSolde = Object.values(carnets).reduce((sum, c) => sum + (c.solde || 0), 0);
+                const totalDepots = transactions.filter(t => t.type === 'depot').reduce((sum, t) => sum + t.montant, 0);
+                const totalRetraits = transactions.filter(t => t.type === 'retrait').reduce((sum, t) => sum + t.montant, 0);
+                const pendingSynced = pending.filter(t => t.synced).length;
+
+                const backup = {
+                    version: '2.0',
+                    exportedAt: new Date().toISOString(),
+                    exportedBy: 'MUTEB Admin',
+                    
+                    // Données
+                    data: {
+                        carnets: carnets,
+                        transactions: transactions,
+                        pending_sync: pending
+                    },
+
+                    // Stats
+                    stats: {
+                        nb_carnets: Object.keys(carnets).length,
+                        nb_transactions: transactions.length,
+                        total_solde: totalSolde,
+                        total_depots: totalDepots,
+                        total_retraits: totalRetraits,
+                        nb_pending_transactions: pending.filter(t => !t.synced).length,
+                        nb_synced_transactions: pendingSynced,
+                        localStorage_size: new Blob(Object.values(localStorage)).size + ' bytes'
+                    }
+                };
+
+                // Créer fichier
+                const dataStr = JSON.stringify(backup, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'MUTEB_backup_complete_' + new Date().toISOString().split('T')[0] + '.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showStatus('✅ Backup complet téléchargé!', 'success');
+            } catch (err) {
+                showStatus('❌ Erreur téléchargement: ' + err.message, 'error');
+            }
+        }
+
+        function downloadOnlyBackup() {
+            try {
+                const carnets = JSON.parse(localStorage.getItem('muteb_carnets') || '{}');
+                const transactions = JSON.parse(localStorage.getItem('muteb_transactions') || '[]');
+                const pending = JSON.parse(localStorage.getItem('muteb_pending_sync') || '[]');
+
+                const data = {
+                    carnets: carnets,
+                    transactions: transactions,
+                    pending_sync: pending
+                };
+
+                const dataStr = JSON.stringify(data, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'MUTEB_data_' + new Date().toISOString().split('T')[0] + '.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showStatus('✅ Données téléchargées!', 'success');
+            } catch (err) {
+                showStatus('❌ Erreur: ' + err.message, 'error');
+            }
+        }
+
+        // Actualiser stats au chargement des paramètres
+        function openSettingsModal() {
+            openModal('settingsModal');
+            setTimeout(updateDataStats, 100);
         }
 
         // Delete Selected - FIXED VERSION
